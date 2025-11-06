@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./cart.css">
+  <title>Your Cart</title>
+
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+
+  <style>
+    /* === Reset & Base === */
+   
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Your Cart 🛒</h1>
+    <a href="index.html" class="btn">Back to Home</a>
+  </header>
+
+  <main class="cart-page">
+    <section id="cartItemsSection">
+      <h2>Cart Products</h2>
+      <ul id="cartList"></ul>
+      <h3>Total: $<span id="totalPrice">0.00</span></h3>
+    </section>
+
+    <section id="favoritesSection">
+      <h2>Your Favorites ❤️</h2>
+      <ul id="favoritesList"></ul>
+    </section>
+  </main>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    const cartList = document.getElementById("cartList");
+    const favoritesList = document.getElementById("favoritesList");
+    const totalEl = document.getElementById("totalPrice");
+
+    let total = 0;
+
+    cart.forEach((item, i) => {
+      total += item.price * item.quantity;
+      cartList.innerHTML += `
+        <li class="cart-item">
+          <div class="product-info">
+            <img src="${item.image}" alt="${item.name}">
+            <div>
+              <strong>${item.name}</strong><br>
+              $${item.price} × ${item.quantity}
+            </div>
+          </div>
+          <div class="product-actions">
+            <button onclick="increaseQty(${i})">+</button>
+            <button onclick="decreaseQty(${i})">-</button>
+          </div>
+        </li>
+      `;
+    });
+
+    totalEl.textContent = total.toFixed(2);
+
+    favorites.forEach((f, i) => {
+      if (f && f.name && f.image) {
+        favoritesList.innerHTML += `
+          <li>
+            <div class="product-info">
+              <img src="${f.image}" alt="${f.name}">
+              <span>${f.name}</span>
+            </div>
+            <i class="bi bi-heart-fill fav-icon" onclick="removeFav(${i})"></i>
+          </li>
+        `;
+      }
+    });
+
+    function increaseQty(i) {
+      cart[i].quantity++;
+      localStorage.setItem("cart", JSON.stringify(cart));
+      location.reload();
+    }
+
+    function decreaseQty(i) {
+      if (cart[i].quantity > 1) cart[i].quantity--;
+      else cart.splice(i, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      location.reload();
+    }
+
+    function removeFav(i) {
+      favorites.splice(i, 1);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      location.reload();
+    }
+  </script>
+</body>
+</html>
